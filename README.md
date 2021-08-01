@@ -6,6 +6,12 @@ Converts any file into images with bytes as pixel values. And, packs those image
 Used python libraries: 
 **argparse**, **numpy**, **PIL**, **shutil**
 
+To intall use:
+
+```bash
+pip install shutil numpy pillow argparse
+```
+
 Dependencies: **ffmpeg**
 
 If `ffmpeg` is not installed, use:
