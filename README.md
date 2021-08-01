@@ -23,6 +23,9 @@ sudo pacman -S ffmpeg
 ffmpeg must be added as an environment variable in Windows.
 Or, modify the file to include the ffmpeg path.
 
+You might want to follow these steps to install ffmpeg on windows: https://windowsloop.com/install-ffmpeg-windows-10/
+
+
 ## Usage
 `encoder.py`
 ```bash
