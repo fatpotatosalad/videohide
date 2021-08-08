@@ -25,13 +25,11 @@ all_frames = [ temp_path + x for x in os.listdir(temp_path) if '.png' in x ]
 all_frames.sort()
 final_barr = b''
 
-for cnt, frame in enumerate(all_frames):
-    finframe = np.asarray(Image.open(frame))
-    final_barr += bytearray(finframe.flatten().tolist())
-    print(f"Progress    [{round((cnt/len(all_frames)*100))}%]",end="\r")
-
 with open(out_fil,'wb') as fil:
-    fil.write(final_barr)
+    for cnt, frame in enumerate(all_frames):
+        finframe = np.asarray(Image.open(frame))
+        fil.write(bytearray(finframe.flatten().tolist()))
+        print(f"Progress    [{round((cnt/len(all_frames)*100))}%]",end="\r")
 
 for x in all_frames:
     os.remove(x)
