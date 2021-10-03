@@ -1,7 +1,5 @@
-import os, subprocess, argparse, shutil
+import os, argparse, cv2
 import numpy as np
-from PIL import Image
-from time import sleep
 
 parser = argparse.ArgumentParser(description='Decodes specially encoded data from video')
 parser.add_argument('in_fil', metavar='i', type=str, help='input file')
@@ -10,32 +8,29 @@ args = parser.parse_args()
 
 in_path = args.in_fil
 out_path = args.out_dir
-temp_path = os.path.join(out_path, ".temp/")
 base_in = os.path.basename(in_path)
 out_fil = os.path.join(out_path, os.path.splitext(base_in)[0])
 
-try:
-    os.mkdir(temp_path)
-except Exception:
-    shutil.rmtree(temp_path)
-    os.mkdir(temp_path)
-
-subprocess.call(f'ffmpeg -loglevel quiet -i "{in_path}" "{temp_path}%05d.png"')
-all_frames = [ temp_path + x for x in os.listdir(temp_path) if '.png' in x ]
-all_frames.sort()
 final_barr = b''
+video = cv2.VideoCapture(in_path)
+total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+
+def progress(x):
+    prog_steps = 50
+    prog_sym = "="
+    progress = (x+1)/total_frames
+    prog_int = int(progress * 100)
+    progress_sp = int(progress * prog_steps)
+    print(f'['+ int(progress*prog_steps) * prog_sym + int(prog_steps-progress_sp) * ' ' + f'][{prog_int}%]',end='\r')
 
 with open(out_fil,'wb') as fil:
-    for cnt, frame in enumerate(all_frames):
-        finframe = np.asarray(Image.open(frame))
-        fil.write(bytearray(finframe.flatten().tolist()))
-        print(f"Progress    [{round((cnt/len(all_frames)*100))}%]",end="\r")
-
-for x in all_frames:
-    os.remove(x)
-
-try:
-    os.rmdir(temp_path)
-except Exception:
-    pass
-print("")
+    cnt = 0
+    while video.isOpened():
+        success, frame = video.read()
+        try:
+            fil.write(bytearray(frame.flatten().tolist()))
+        except AttributeError:
+            break
+        progress(cnt)
+        cnt += 1
+print('\nDone')
